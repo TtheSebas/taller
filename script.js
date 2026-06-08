@@ -2,7 +2,7 @@
 //  CONFIGURACIÓN
 //  ⚠️ Cambia este número por el real (código de país sin + ni espacios)
 // ═══════════════════════════════════════
-const TU_NUMERO_WA = '593999999999';
+const TU_NUMERO_WA = '593990629502';
 
 
 // ═══════════════════════════════════════
