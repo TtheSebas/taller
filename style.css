@@ -440,7 +440,7 @@ nav {
 
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.75rem;
 }
 
@@ -529,6 +529,92 @@ nav {
 .card-cta:hover {
     color: var(--walnut);
     gap: 10px;
+}
+
+/* Banner CTA — ¿No encontraste lo que buscabas? */
+.collections-cta-banner {
+    margin-top: 3rem;
+    background: linear-gradient(135deg, var(--espresso) 0%, #4a2c12 100%);
+    border-radius: var(--radius-md);
+    padding: 2.5rem 3rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    border: 1px solid rgba(192, 146, 80, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.collections-cta-banner::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 1px solid rgba(192, 146, 80, 0.1);
+    pointer-events: none;
+}
+
+.collections-cta-icon {
+    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(192, 146, 80, 0.12);
+    border: 1px solid rgba(192, 146, 80, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+}
+
+.collections-cta-text {
+    flex: 1;
+    min-width: 220px;
+}
+
+.collections-cta-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+}
+
+.collections-cta-sub {
+    font-size: 14px;
+    color: rgba(253, 250, 246, 0.55);
+    line-height: 1.65;
+}
+
+.collections-cta-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--green-wa);
+    color: #fff;
+    border: none;
+    padding: 0.9rem 1.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    transition: background var(--transition), transform var(--transition);
+    white-space: nowrap;
+}
+
+.collections-cta-btn:hover {
+    background: var(--green-wa-dark);
+    transform: translateY(-2px);
+}
+
+.collections-cta-btn:active {
+    transform: translateY(0);
 }
 
 /* ═══════════════════════════════════════
@@ -1005,6 +1091,7 @@ footer {
    RESPONSIVE — TABLET (≤ 960px)
 ═══════════════════════════════════════ */
 @media (max-width: 960px) {
+
     .why-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -1012,6 +1099,12 @@ footer {
     .cards-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .collections-cta-banner {
+        padding: 2rem;
+        gap: 1.5rem;
+    }
+
 
     .testimonials-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1071,6 +1164,7 @@ footer {
         font-size: 22px;
     }
 
+
     .cards-grid {
         grid-template-columns: 1fr;
     }
@@ -1078,6 +1172,21 @@ footer {
     .collections,
     .testimonials {
         padding: 3.5rem 1.25rem;
+    }
+
+    .collections-cta-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem 1.5rem;
+    }
+
+    .collections-cta-icon {
+        margin: 0 auto;
+    }
+
+    .collections-cta-btn {
+        width: 100%;
+        justify-content: center;
     }
 
     .why-us {
