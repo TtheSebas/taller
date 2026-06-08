@@ -132,7 +132,7 @@ nav {
     background: var(--walnut);
 }
 
-/* Hamburger */
+/* Hamburger (móvil) */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -140,6 +140,7 @@ nav {
     background: none;
     border: none;
     padding: 4px;
+    cursor: pointer;
 }
 
 .hamburger span {
@@ -163,7 +164,7 @@ nav {
     transform: translateY(-7px) rotate(-45deg);
 }
 
-/* Menú móvil */
+/* Menú móvil desplegable */
 .mobile-menu {
     display: none;
     position: fixed;
@@ -176,10 +177,15 @@ nav {
     flex-direction: column;
     padding: 1rem 2rem 1.5rem;
     gap: 0.5rem;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: transform var(--transition), opacity var(--transition);
 }
 
 .mobile-menu.open {
     display: flex;
+    transform: translateY(0);
+    opacity: 1;
 }
 
 .mobile-menu a {
@@ -204,6 +210,7 @@ nav {
     min-height: 90vh;
 }
 
+/* Panel izquierdo oscuro */
 .hero-left {
     background: var(--espresso);
     display: flex;
@@ -214,6 +221,7 @@ nav {
     overflow: hidden;
 }
 
+/* Círculos decorativos */
 .hero-left::before {
     content: '';
     position: absolute;
@@ -265,6 +273,7 @@ nav {
     margin-bottom: 2.5rem;
 }
 
+/* Botones hero */
 .hero-actions {
     display: flex;
     gap: 1rem;
@@ -301,11 +310,13 @@ nav {
 .hero-btn-outline {
     display: inline-flex;
     align-items: center;
+    gap: 10px;
     background: transparent;
     color: var(--white);
     border: 1px solid rgba(253, 250, 246, 0.3);
     padding: 0.9rem 1.75rem;
     font-size: 13px;
+    font-weight: 400;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     border-radius: var(--radius-sm);
@@ -353,7 +364,7 @@ nav {
     background: rgba(192, 146, 80, 0.25);
 }
 
-/* Hero imagen */
+/* Panel derecho imagen */
 .hero-right {
     background: var(--sand);
     position: relative;
@@ -373,6 +384,7 @@ nav {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
     transition: transform 0.6s ease;
 }
 
@@ -438,6 +450,7 @@ nav {
     line-height: 1.7;
 }
 
+/* Grid de cards */
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -759,7 +772,7 @@ nav {
 }
 
 /* ═══════════════════════════════════════
-   CONTACTO
+   SECCIÓN CONTACTO
 ═══════════════════════════════════════ */
 .contact-section {
     background: var(--espresso);
@@ -840,7 +853,9 @@ nav {
     }
 }
 
-/* Formulario */
+/* ═══════════════════════════════════════
+   FORMULARIO
+═══════════════════════════════════════ */
 .form-card {
     background: var(--white);
     border-radius: var(--radius-md);
@@ -938,6 +953,7 @@ nav {
     display: block;
 }
 
+/* Botón enviar */
 .wa-submit {
     width: 100%;
     display: flex;
@@ -1091,7 +1107,6 @@ footer {
    RESPONSIVE — TABLET (≤ 960px)
 ═══════════════════════════════════════ */
 @media (max-width: 960px) {
-
     .why-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -1104,7 +1119,6 @@ footer {
         padding: 2rem;
         gap: 1.5rem;
     }
-
 
     .testimonials-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1143,6 +1157,7 @@ footer {
         display: flex;
     }
 
+    /* Hero: una sola columna */
     .hero {
         grid-template-columns: 1fr;
         min-height: auto;
@@ -1164,7 +1179,7 @@ footer {
         font-size: 22px;
     }
 
-
+    /* Colecciones: 1 columna */
     .cards-grid {
         grid-template-columns: 1fr;
     }
@@ -1189,6 +1204,7 @@ footer {
         justify-content: center;
     }
 
+    /* Por qué elegirnos: 1 columna */
     .why-us {
         padding: 3.5rem 1.25rem;
     }
@@ -1197,10 +1213,12 @@ footer {
         grid-template-columns: 1fr;
     }
 
+    /* Testimonios: 1 columna */
     .testimonials-grid {
         grid-template-columns: 1fr;
     }
 
+    /* Contacto: 1 columna */
     .contact-section {
         grid-template-columns: 1fr;
         gap: 2.5rem;
@@ -1211,6 +1229,7 @@ footer {
         padding: 2rem 1.25rem;
     }
 
+    /* Footer */
     .footer-top {
         grid-template-columns: 1fr;
         padding: 2.5rem 1.25rem;
@@ -1225,10 +1244,23 @@ footer {
         padding: 1rem 1.25rem;
     }
 
+    /* Botón flotante más pequeño en móvil */
     .wa-float {
         width: 50px;
         height: 50px;
         bottom: 1.25rem;
         right: 1.25rem;
     }
+}
+
+/* Nav scrolled state */
+nav.nav--scrolled {
+    background: rgba(45, 28, 16, 0.98);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.18);
+}
+
+/* Mobile menu open state */
+.mobile-menu.mobile-menu--open {
+    display: flex;
+    flex-direction: column;
 }

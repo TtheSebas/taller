@@ -1,162 +1,354 @@
-// ═══════════════════════════════════════
-//  CONFIGURACIÓN
-//  ⚠️ Cambia este número por el real (código de país sin + ni espacios)
-// ═══════════════════════════════════════
-const TU_NUMERO_WA = '593990629502';
+/* ===================================================
+   script.js — Muebles Mesias
+   Galeria expandible + Lightbox + Nav + WhatsApp
+   =================================================== */
 
+/* --------------------------------------------------
+   DATOS DE GALERIAS
+   -------------------------------------------------- */
+const GALLERIES = {
+  sala: {
+    title: "Sala & Sofas",
+    images: [
+      { src: "img/gal_sala_1.png", alt: "Sofa modular sala Mesias" },
+      { src: "img/gal_sala_2.png", alt: "Sofa clasico piel Mesias" },
+      { src: "img/gal_sala_3.png", alt: "Sala con sofa terciopelo" }
+    ]
+  },
+  dormitorio: {
+    title: "Dormitorio",
+    images: [
+      { src: "img/gal_dorm_1.png", alt: "Cama tapizada Mesias" },
+      { src: "img/gal_dorm_2.png", alt: "Armario dormitorio Mesias" },
+      { src: "img/gal_dorm_3.png", alt: "Juego de dormitorio completo" }
+    ]
+  },
+  comedor: {
+    title: "Comedor",
+    images: [
+      { src: "img/gal_com_1.png", alt: "Mesa comedor 6 puestos Mesias" },
+      { src: "img/gal_com_2.png", alt: "Mesa redonda comedor Mesias" },
+      { src: "img/gal_com_3.png", alt: "Comedor rustico moderno" }
+    ]
+  },
+  closet: {
+    title: "Closet",
+    images: [
+      { src: "img/gal_clos_1.png", alt: "Closet a medida Mesias" }
+    ]
+  },
+  espejos: {
+    title: "Espejos",
+    images: [
+      { src: "img/gal_esp_1.png", alt: "Espejo con marco de madera Mesias" }
+    ]
+  },
+  puertas: {
+    title: "Puertas",
+    images: [
+      { src: "img/gal_puert_1.png", alt: "Puerta interior madera Mesias" }
+    ]
+  },
+  otras: {
+    title: "Otras opciones",
+    images: [
+      { src: "img/gal_otras_1.png", alt: "Otros muebles Mesias" }
+    ]
+  }
+};
 
-// ═══════════════════════════════════════
-//  MENÚ HAMBURGUESA (MÓVIL)
-// ═══════════════════════════════════════
-function toggleMenu() {
-    const menu = document.getElementById('mobileMenu');
-    const btn = document.getElementById('hamburger');
-    const isOpen = menu.classList.toggle('open');
-    btn.classList.toggle('open', isOpen);
-    btn.setAttribute('aria-expanded', isOpen);
-}
+/* --------------------------------------------------
+   ESTADO
+   -------------------------------------------------- */
+let currentGallery = null;
+let lightboxImages  = [];
+let lightboxIndex   = 0;
 
-// Cerrar menú al hacer clic fuera
-document.addEventListener('click', function (e) {
-    const menu = document.getElementById('mobileMenu');
-    const btn = document.getElementById('hamburger');
-    if (!menu.contains(e.target) && !btn.contains(e.target)) {
-        menu.classList.remove('open');
-        btn.classList.remove('open');
-        btn.setAttribute('aria-expanded', false);
+/* --------------------------------------------------
+   INICIO AL CARGAR EL DOM
+   -------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", function () {
+
+  /* ---- DOM REFS ---- */
+  const galleryPanel    = document.getElementById("galleryPanel");
+  const galleryGrid     = document.getElementById("galleryGrid");
+  const galleryTitle    = document.getElementById("galleryTitle");
+  const galleryClose    = document.getElementById("galleryClose");
+  const lightbox        = document.getElementById("lightbox");
+  const lightboxImg     = document.getElementById("lightboxImg");
+  const lightboxClose   = document.getElementById("lightboxClose");
+  const lightboxPrev    = document.getElementById("lightboxPrev");
+  const lightboxNext    = document.getElementById("lightboxNext");
+  const lightboxBackdrop = document.getElementById("lightboxBackdrop");
+  const lightboxCounter = document.getElementById("lightboxCounter");
+
+  /* ---- GALERIA EXPANDIBLE ---- */
+
+  function openGallery(key) {
+    const data = GALLERIES[key];
+    if (!data) return;
+
+    // Toggle: si ya esta abierto el mismo, cerrar
+    if (currentGallery === key) {
+      closeGallery();
+      return;
     }
-});
 
+    currentGallery = key;
+    galleryTitle.textContent = data.title;
+    galleryGrid.innerHTML = "";
+    lightboxImages = data.images;
 
-// ═══════════════════════════════════════
-//  CONTADOR DE CARACTERES EN TEXTAREA
-// ═══════════════════════════════════════
-const textarea = document.getElementById('mensaje');
-const charCount = document.getElementById('charCount');
+    data.images.forEach(function (img, i) {
+      const item = document.createElement("div");
+      item.className = "gallery-item";
+      item.setAttribute("tabindex", "0");
+      item.setAttribute("role", "button");
+      item.setAttribute("aria-label", "Ver imagen " + (i + 1));
+      item.innerHTML =
+        '<img src="' + img.src + '" alt="' + img.alt + '" loading="lazy">' +
+        '<div class="gallery-item-overlay">' +
+          '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">' +
+            '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>' +
+          '</svg>' +
+        '</div>';
 
-if (textarea && charCount) {
-    textarea.addEventListener('input', function () {
-        charCount.textContent = `${this.value.length} / 500`;
+      item.addEventListener("click", function () { openLightbox(i); });
+      item.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") openLightbox(i);
+      });
+
+      galleryGrid.appendChild(item);
+
+      // Animacion escalonada
+      setTimeout(function () {
+        item.classList.add("gallery-item--visible");
+      }, 80 * i + 50);
     });
-}
 
+    galleryPanel.classList.add("gallery-panel--open");
+    galleryPanel.setAttribute("aria-hidden", "false");
 
-// ═══════════════════════════════════════
-//  VALIDACIÓN EN TIEMPO REAL
-// ═══════════════════════════════════════
-function validarCampo(el) {
-    const esValido = el.value.trim() !== '';
-    el.classList.toggle('error', !esValido);
-    return esValido;
-}
+    setTimeout(function () {
+      galleryPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 400);
+  }
 
-['nombre', 'telefono', 'ciudad', 'interes'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const limpiar = () => el.classList.remove('error');
-    el.addEventListener('input', limpiar);
-    el.addEventListener('change', limpiar);
-});
+  function closeGallery() {
+    currentGallery = null;
+    galleryPanel.classList.remove("gallery-panel--open");
+    galleryPanel.setAttribute("aria-hidden", "true");
 
+    setTimeout(function () {
+      galleryGrid.innerHTML = "";
+      document.querySelectorAll(".card.card--active").forEach(function (c) {
+        c.classList.remove("card--active");
+        c.setAttribute("aria-expanded", "false");
+      });
+    }, 600);
+  }
 
-// ═══════════════════════════════════════
-//  ENVÍO POR WHATSAPP
-// ═══════════════════════════════════════
-function enviarWhatsApp() {
-    const nombre = document.getElementById('nombre');
-    const telefono = document.getElementById('telefono');
-    const ciudad = document.getElementById('ciudad');
-    const interes = document.getElementById('interes');
-    const mensaje = document.getElementById('mensaje');
-    const btnEnviar = document.getElementById('btnEnviar');
+  // Click en el grid de cards
+  var collectionsGrid = document.getElementById("collectionsGrid");
+  if (collectionsGrid) {
+    collectionsGrid.addEventListener("click", function (e) {
+      var card = e.target.closest(".card[data-gallery]");
+      if (!card) return;
+      if (e.target.closest(".card-cta")) return;
 
-    // Validar campos requeridos
-    const camposRequeridos = [nombre, telefono, ciudad, interes];
-    const formularioValido = camposRequeridos.map(validarCampo).every(Boolean);
+      var key = card.dataset.gallery;
 
-    if (!formularioValido) {
-        const primerError = camposRequeridos.find(el => el.classList.contains('error'));
-        if (primerError) {
-            primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            primerError.focus();
-        }
-        return;
+      document.querySelectorAll(".card[data-gallery]").forEach(function (c) {
+        c.classList.remove("card--active");
+        c.setAttribute("aria-expanded", "false");
+      });
+
+      if (currentGallery !== key) {
+        card.classList.add("card--active");
+        card.setAttribute("aria-expanded", "true");
+      }
+
+      openGallery(key);
+    });
+  }
+
+  if (galleryClose) {
+    galleryClose.addEventListener("click", closeGallery);
+  }
+
+  /* ---- LIGHTBOX ---- */
+
+  function openLightbox(index) {
+    lightboxIndex = index;
+    renderLightboxImage();
+    lightbox.classList.add("lightbox--open");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove("lightbox--open");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  function renderLightboxImage() {
+    var img = lightboxImages[lightboxIndex];
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+    lightboxCounter.textContent = (lightboxIndex + 1) + " / " + lightboxImages.length;
+    lightboxPrev.disabled = (lightboxIndex === 0);
+    lightboxNext.disabled = (lightboxIndex === lightboxImages.length - 1);
+  }
+
+  if (lightboxClose)    lightboxClose.addEventListener("click", closeLightbox);
+  if (lightboxBackdrop) lightboxBackdrop.addEventListener("click", closeLightbox);
+
+  if (lightboxPrev) {
+    lightboxPrev.addEventListener("click", function () {
+      if (lightboxIndex > 0) { lightboxIndex--; renderLightboxImage(); }
+    });
+  }
+  if (lightboxNext) {
+    lightboxNext.addEventListener("click", function () {
+      if (lightboxIndex < lightboxImages.length - 1) { lightboxIndex++; renderLightboxImage(); }
+    });
+  }
+
+  // Teclado para lightbox
+  document.addEventListener("keydown", function (e) {
+    if (!lightbox || !lightbox.classList.contains("lightbox--open")) return;
+    if (e.key === "ArrowLeft"  && lightboxIndex > 0)                          { lightboxIndex--; renderLightboxImage(); }
+    if (e.key === "ArrowRight" && lightboxIndex < lightboxImages.length - 1)  { lightboxIndex++; renderLightboxImage(); }
+    if (e.key === "Escape") closeLightbox();
+  });
+
+  // Swipe tactil en lightbox
+  var touchStartX = 0;
+  if (lightbox) {
+    lightbox.addEventListener("touchstart", function (e) {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    lightbox.addEventListener("touchend", function (e) {
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) < 40) return;
+      if (dx < 0 && lightboxIndex < lightboxImages.length - 1) { lightboxIndex++; renderLightboxImage(); }
+      if (dx > 0 && lightboxIndex > 0)                          { lightboxIndex--; renderLightboxImage(); }
+    });
+  }
+
+  /* ---- NAVBAR SCROLL ---- */
+  var nav = document.querySelector("nav");
+  window.addEventListener("scroll", function () {
+    if (nav) nav.classList.toggle("nav--scrolled", window.scrollY > 50);
+  }, { passive: true });
+
+  /* ---- MENU MOVIL ---- */
+  window.toggleMenu = function () {
+    var menu = document.getElementById("mobileMenu");
+    var btn  = document.getElementById("hamburger");
+    if (!menu) return;
+    var open = menu.classList.toggle("mobile-menu--open");
+    if (btn) btn.setAttribute("aria-expanded", String(open));
+  };
+
+  window.addEventListener("scroll", function () {
+    var menu = document.getElementById("mobileMenu");
+    if (menu && menu.classList.contains("mobile-menu--open")) {
+      menu.classList.remove("mobile-menu--open");
+      var btn = document.getElementById("hamburger");
+      if (btn) btn.setAttribute("aria-expanded", "false");
     }
+  }, { passive: true });
 
-    // Construir texto del mensaje
-    const lineas = [
-        `Hola, me comunico desde su página web 👋`,
-        ``,
-        `*Nombre:* ${nombre.value.trim()}`,
-        `*Teléfono:* ${telefono.value.trim()}`,
-        `*Ciudad:* ${ciudad.value.trim()}`,
-        `*Interés:* ${interes.value}`,
-    ];
+  // Scroll suave para links ancla
+  document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      var target = document.querySelector(link.getAttribute("href"));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  });
 
-    if (mensaje && mensaje.value.trim()) {
-        lineas.push(`*Mensaje:* ${mensaje.value.trim()}`);
-    }
-    lineas.push(``, `Quedo a la espera de su respuesta. ¡Gracias!`);
+  /* ---- CONTADOR DE CARACTERES ---- */
+  var msgArea   = document.getElementById("mensaje");
+  var charCount = document.getElementById("charCount");
+  if (msgArea && charCount) {
+    msgArea.addEventListener("input", function () {
+      charCount.textContent = msgArea.value.length + " / 500";
+    });
+  }
 
-    const texto = encodeURIComponent(lineas.join('\n'));
-    const url = `https://wa.me/${TU_NUMERO_WA}?text=${texto}`;
-
-    // Feedback visual: deshabilitar botón 3 segundos
-    if (btnEnviar) {
-        const svgWa = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
-
-        btnEnviar.disabled = true;
-        btnEnviar.textContent = 'Abriendo WhatsApp...';
-
-        setTimeout(() => {
-            btnEnviar.disabled = false;
-            btnEnviar.innerHTML = `${svgWa} Enviar por WhatsApp`;
-        }, 3000);
-    }
-
-    // Abrir WhatsApp de forma segura
-    window.open(url, '_blank', 'noopener,noreferrer');
-}
-
-
-// ═══════════════════════════════════════
-//  ANIMACIONES AL HACER SCROLL
-// ═══════════════════════════════════════
-const animStyles = document.createElement('style');
-animStyles.textContent = `
-    .animate-on-scroll {
-        opacity: 0;
-        transform: translateY(24px);
-        transition: opacity 0.55s ease, transform 0.55s ease;
-    }
-    .animate-on-scroll.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-`;
-document.head.appendChild(animStyles);
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+  /* ---- ANIMACIONES DE ENTRADA (suaves, sin romper visibilidad) ---- */
+  var animTargets = document.querySelectorAll(".why-item, .testimonial-card");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
+          entry.target.style.opacity    = "1";
+          entry.target.style.transform  = "translateY(0)";
+          io.unobserve(entry.target);
         }
+      });
+    }, { threshold: 0.1 });
+
+    animTargets.forEach(function (el) {
+      el.style.opacity    = "0";
+      el.style.transform  = "translateY(20px)";
+      el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+      io.observe(el);
     });
-}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  }
 
-document.querySelectorAll('.card, .why-item, .testimonial-card, .contact-left, .form-card').forEach(el => {
-    el.classList.add('animate-on-scroll');
-    observer.observe(el);
-});
+}); /* fin DOMContentLoaded */
 
+/* --------------------------------------------------
+   FORMULARIO WHATSAPP (global para onclick en HTML)
+   -------------------------------------------------- */
+function enviarWhatsApp() {
+  var nombre   = document.getElementById("nombre");
+  var telefono = document.getElementById("telefono");
+  var ciudad   = document.getElementById("ciudad");
+  var interes  = document.getElementById("interes");
+  var mensaje  = document.getElementById("mensaje");
+  var btn      = document.getElementById("btnEnviar");
 
-// ═══════════════════════════════════════
-//  SOMBRA DEL NAV AL HACER SCROLL
-// ═══════════════════════════════════════
-window.addEventListener('scroll', () => {
-    const nav = document.querySelector('nav');
-    nav.style.boxShadow = window.scrollY > 20
-        ? '0 4px 20px rgba(44, 26, 14, 0.08)'
-        : 'none';
-}, { passive: true });
+  var valid = true;
+  [nombre, telefono, ciudad, interes].forEach(function (f) { f.classList.remove("error"); });
+
+  if (!nombre.value.trim())   { nombre.classList.add("error");   valid = false; }
+  if (!telefono.value.trim() || !/^[\+0-9\s\-]{7,}$/.test(telefono.value.trim())) {
+    telefono.classList.add("error"); valid = false;
+  }
+  if (!ciudad.value.trim())   { ciudad.classList.add("error");   valid = false; }
+  if (!interes.value)         { interes.classList.add("error");  valid = false; }
+
+  if (!valid) {
+    var firstError = document.querySelector(".field input.error, .field select.error");
+    if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = "Abriendo WhatsApp...";
+
+  var wa    = "593999999999"; // Cambia por el numero real
+  var lines = [
+    "Hola! Me interesa obtener informacion sobre muebles Mesias.",
+    "Nombre: "   + nombre.value.trim(),
+    "Telefono: " + telefono.value.trim(),
+    "Ciudad: "   + ciudad.value.trim(),
+    "Interes: "  + interes.value
+  ];
+  if (mensaje.value.trim()) lines.push("Mensaje: " + mensaje.value.trim());
+
+  var url = "https://wa.me/" + wa + "?text=" + encodeURIComponent(lines.join("\n"));
+  window.open(url, "_blank", "noopener");
+
+  setTimeout(function () {
+    btn.disabled = false;
+    btn.textContent = "Enviar por WhatsApp";
+  }, 3500);
+}
