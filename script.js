@@ -1,4 +1,4 @@
-﻿/* ===================================================
+/* ===================================================
    script.js — Muebles Mesias
    Galeria expandible + Lightbox + Nav + WhatsApp
    =================================================== */
@@ -458,12 +458,17 @@ document.addEventListener("DOMContentLoaded", function () {
       vid.controls = true;
       vid.autoplay = true;
       vid.playsInline = true;
-      vid.style.cssText = "max-width:100%;max-height:80vh;border-radius:4px;display:block;margin:0 auto;";
+      vid.style.cssText = "max-width:100%;max-height:80vh;border-radius:4px;display:block;margin:0 auto;animation:lightboxFadeIn 0.3s ease forwards;";
       lightboxImg.parentNode.insertBefore(vid, lightboxImg);
     } else {
       lightboxImg.style.display = "";
-      lightboxImg.src = media.src;
-      lightboxImg.alt = media.alt;
+      // Crossfade logic: opacity 0, change src, opacity 1
+      lightboxImg.style.opacity = "0";
+      setTimeout(function() {
+        lightboxImg.src = media.src;
+        lightboxImg.alt = media.alt;
+        lightboxImg.style.opacity = "1";
+      }, 150);
     }
 
     lightboxCounter.textContent = (lightboxIndex + 1) + " / " + lightboxImages.length;
@@ -578,6 +583,86 @@ document.addEventListener("DOMContentLoaded", function () {
       el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
       io.observe(el);
     });
+  }
+
+  /* ---- SLIDER ANTES / DESPUES ---- */
+  var baRange = document.getElementById('baRange');
+  var baAfter = document.getElementById('baAfter');
+  var baSlider = document.getElementById('baSlider');
+  if (baRange && baAfter && baSlider) {
+    baRange.addEventListener('input', function () {
+      var val = this.value + '%';
+      baAfter.style.clipPath = 'inset(0 0 0 ' + val + ')';
+      baSlider.style.left = val;
+    });
+  }
+
+  /* ---- FAQ ACORDEON SUAVE ---- */
+  document.querySelectorAll('.faq-item').forEach(function (item) {
+    var summary = item.querySelector('summary');
+    var answer = item.querySelector('.faq-answer');
+    if (!summary || !answer) return;
+
+    answer.style.transition = 'max-height 0.35s ease, padding-bottom 0.35s ease';
+    answer.style.overflow = 'hidden';
+
+    summary.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (item.hasAttribute('open')) {
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        requestAnimationFrame(function () {
+          answer.style.maxHeight = '0';
+          answer.style.paddingBottom = '0';
+        });
+        setTimeout(function () { item.removeAttribute('open'); }, 350);
+      } else {
+        item.setAttribute('open', '');
+        answer.style.maxHeight = '0';
+        answer.style.paddingBottom = '0';
+        requestAnimationFrame(function () {
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+          answer.style.paddingBottom = '';
+        });
+        setTimeout(function () { answer.style.maxHeight = ''; }, 400);
+      }
+    });
+  });
+
+  /* ---- CATALOGO MODAL ---- */
+  var catalogBtn = document.getElementById('catalogBtn');
+  var catalogOverlay = document.getElementById('catalogOverlay');
+  var catalogCloseBtn = document.getElementById('catalogCloseBtn');
+  if (catalogBtn && catalogOverlay) {
+    catalogBtn.addEventListener('click', function () {
+      catalogOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+    if (catalogCloseBtn) {
+      catalogCloseBtn.addEventListener('click', function () {
+        catalogOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    }
+    catalogOverlay.addEventListener('click', function (e) {
+      if (e.target === catalogOverlay) {
+        catalogOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
+  /* ---- SCROLL REVEAL EXPANDIDO ---- */
+  var revealTargets = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && revealTargets.length) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealTargets.forEach(function (el) { revealObserver.observe(el); });
   }
 
 }); /* fin DOMContentLoaded */
